@@ -14,17 +14,12 @@ interface LoginData {
 
 interface AuthResponse {
   token: string;
-  user?: {
-    id: string;
-    userID: string;
-    name?: string;
-  };
+  userId: string;
 }
 
 export interface UserInfo {
   id: string;
   userID: string;
-  name?: string;
   [key: string]: any;
 }
 

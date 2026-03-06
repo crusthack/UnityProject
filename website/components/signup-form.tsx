@@ -43,9 +43,10 @@ export default function SignUpForm() {
       setToken(response.token);
       
       // 사용자 정보 저장
-      if (response.user) {
-        setUser(response.user);
-      }
+      setUser({
+        id: response.userId,
+        userID: response.userId,
+      });
 
       // 대시보드로 이동
       router.push("/dashboard");

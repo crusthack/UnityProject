@@ -34,13 +34,18 @@ export default function LoginForm() {
         password: formData.password,
       });
       
+      console.log("로그인 API 응답:", response); // 디버깅용
+      
       // 토큰 저장
       setToken(response.token);
       
       // 사용자 정보 저장
-      if (response.user) {
-        setUser(response.user);
-      }
+      setUser({
+        id: response.userId,
+        userID: response.userId,
+      });
+
+      console.log("설정된 사용자 정보:", { id: response.userId, userID: response.userId }); // 디버깅용
 
       // 대시보드로 이동
       router.push("/dashboard");

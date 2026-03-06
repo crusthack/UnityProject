@@ -125,7 +125,7 @@ namespace WebServer.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = tokenString });
+            return Ok(new { token = tokenString, userId = user.UserID });
         }
 
         // --- Password helper methods ---

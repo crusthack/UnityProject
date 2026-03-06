@@ -8,6 +8,8 @@ export default function Navbar() {
   const router = useRouter();
   const { isLoggedIn, logout, user } = useAuth();
 
+  console.log("네비바 - 로그인 상태:", isLoggedIn, "사용자:", user); // 디버깅용
+
   const handleLogout = () => {
     logout();
     router.push("/login");
@@ -26,7 +28,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {isLoggedIn ? (
               <>
-                <span className="text-sm">{user?.name} 님</span>
+                <span className="text-sm">{user?.userID} 님</span>
                 <Link
                   href="/dashboard"
                   className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"

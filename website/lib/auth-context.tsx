@@ -1,12 +1,11 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { getJWTCookie, setJWTCookie, removeJWTCookie } from "./cookies";
+import { getJWTCookie, setJWTCookie, removeJWTCookie, getUserCookie, setUserCookie, removeUserCookie } from "./cookies";
 
 interface User {
   id: string;
   userID: string;
-  name?: string;
 }
 
 interface AuthContextType {
@@ -26,12 +25,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로딩 시 쿠키에서 토큰 확인
+  // 초기 로딩 시 쿠키에서 토큰과 사용자 정보 확인
   useEffect(() => {
     const savedToken = getJWTCookie();
+    const savedUser = getUserCookie();
+    
     if (savedToken) {
       setTokenState(savedToken);
     }
+    
+    if (savedUser) {
+      setUser(savedUser);
+    }
+    
     setIsLoading(false);
   }, []);
 
@@ -44,10 +50,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const setUserState = (newUser: User | null) => {
+    setUser(newUser);
+    if (newUser) {
+      setUserCookie(newUser);
+    } else {
+      removeUserCookie();
+    }
+  };
+
   const logout = () => {
     setUser(null);
     setToken(null);
     removeJWTCookie();
+    removeUserCookie();
   };
 
   return (
@@ -57,7 +73,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         isLoading,
         isLoggedIn: !!token,
-        setUser,
+        setUser: setUserState,
         setToken,
         logout,
       }}
