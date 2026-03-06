@@ -2,8 +2,12 @@ import type { NextConfig } from "next";
 
 // website/next.config.ts
 const nextConfig = {
-  output: 'export', // 이 줄이 있어야 website/out 폴더가 생깁니다!
-  distDir: 'out',   // (선택사항) 빌드 결과물 이름을 명시적으로 지정
+  output: 'export',
+  // 리포지토리 이름을 basePath로 설정합니다. (앞에 / 필수)
+  basePath: '/UnityProject', 
+  images: {
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;
