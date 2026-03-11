@@ -7,6 +7,7 @@ using WebServer.Models;
 
 namespace WebServer.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class UserController : ControllerBase
@@ -21,7 +22,6 @@ namespace WebServer.Controllers
         // 현재 인증된 사용자 정보를 반환합니다.
         // JWT로 인증된 사용자만 접근할 수 있도록 [Authorize]를 사용합니다.
         // 응답에는 비밀번호 관련 필드를 포함하지 않습니다.
-        [Authorize]
         [HttpGet("info")]
         public IActionResult GetCurrentUser()
         {
@@ -33,12 +33,33 @@ namespace WebServer.Controllers
             if (!int.TryParse(uidClaim, out var uid))
                 return Unauthorized();
 
-            var user = _context.Users.Find(uid);
-            if (user == null)
+            var u = _context.Users.Find(uid);
+            if (u == null)
                 return NotFound();
 
-            // 사용자명만 반환 (민감 데이터 제외)
-            return Ok(new { uid = user.UserNo, username = user.UserID });
+            return Ok(new
+            {
+                u.UserNo,
+                UserID = u.UserID,
+                Created = u.CreatedAt,
+                Salt = u.PasswordSalt,
+            });
+        }
+
+        [HttpGet("everyuser")]
+        public IActionResult GetEveryUserInfo()
+        {
+            var users = _context.Users
+                    .Select(u => new
+                    {
+                        u.UserNo,
+                        UserID = u.UserID,
+                        Created = u.CreatedAt,
+                        Salt = u.PasswordSalt,
+                    })
+                    .ToList();
+
+            return Ok(users);
         }
     }
 }

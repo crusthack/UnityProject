@@ -1,14 +1,30 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
+import { getUserInfo, UserInfoResponse } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
-  const { isLoggedIn, logout, user } = useAuth();
+  const { isLoggedIn, logout, token } = useAuth();
+  const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
 
-  console.log("네비바 - 로그인 상태:", isLoggedIn, "사용자:", user); // 디버깅용
+  useEffect(() => {
+    if (isLoggedIn && token) {
+      getUserInfo(token)
+        .then((info) => {
+          setUserInfo(info);
+          console.log("사용자 정보 조회 성공:", info); // 디버깅용
+        })
+        .catch((error) => {
+          console.error("사용자 정보 조회 실패:", error);
+        });
+    } else {
+      setUserInfo(null);
+    }
+  }, [isLoggedIn, token]);
 
   const handleLogout = () => {
     logout();
@@ -28,7 +44,7 @@ export default function Navbar() {
           <div className="flex items-center space-x-4">
             {isLoggedIn ? (
               <>
-                <span className="text-sm">{user?.userID} 님</span>
+                <span className="text-sm">{userInfo?.userID} 님</span>
                 <Link
                   href="/dashboard"
                   className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"

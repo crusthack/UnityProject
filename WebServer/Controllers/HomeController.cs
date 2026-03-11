@@ -9,19 +9,22 @@ namespace WebServer.Controllers
     [ApiController]
     public class HomeController : ControllerBase
     {
+        public class TestRequest
+        {
+            public required string testMessage { get; set; }
+            public required int testNumber { get; set; }
+        }
+
         [HttpGet("/")]
         public string Index()
         {
             return "hello, world!!";
         }
 
-        [Authorize]
-        [HttpGet("/profile")]
-        public IActionResult Profile()
+        [HttpPost("test")]
+        public string Test(TestRequest request)
         {
-            var id = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var name = User.Identity?.Name ?? User.FindFirstValue(ClaimTypes.Name);
-            return Ok(new { uid = id, username = name });
+            return $"test message: {request.testMessage}. testNum: {request.testNumber}";
         }
     }
 }

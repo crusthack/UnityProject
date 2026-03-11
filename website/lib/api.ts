@@ -12,19 +12,20 @@ interface LoginData {
   password: string;
 }
 
-interface AuthResponse {
+interface LoginResponse {
   token: string;
-  userId: string;
+  userID: string;
 }
 
-export interface UserInfo {
-  id: string;
+export interface UserInfoResponse {
+  userNo: string;
   userID: string;
-  [key: string]: any;
+  created: string;
+  salt: string;
 }
 
 // 회원가입
-export async function signUp(data: SignUpData): Promise<AuthResponse> {
+export async function signUp(data: SignUpData): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE_URL}/Auth/signup`, {
     method: "POST",
     headers: {
@@ -42,7 +43,7 @@ export async function signUp(data: SignUpData): Promise<AuthResponse> {
 }
 
 // 로그인
-export async function login(data: LoginData): Promise<AuthResponse> {
+export async function login(data: LoginData): Promise<LoginResponse> {
   const response = await fetch(`${API_BASE_URL}/Auth/login`, {
     method: "POST",
     headers: {
@@ -60,7 +61,7 @@ export async function login(data: LoginData): Promise<AuthResponse> {
 }
 
 // 사용자 정보 조회
-export async function getUserInfo(token: string): Promise<UserInfo> {
+export async function getUserInfo(token: string): Promise<UserInfoResponse> {
   const response = await fetch(`${API_BASE_URL}/user/info`, {
     method: "GET",
     headers: {
@@ -73,17 +74,23 @@ export async function getUserInfo(token: string): Promise<UserInfo> {
     const error = await response.json();
     throw new Error(error.message || "사용자 정보 조회 실패");
   }
-
-  return response.json();
+  var r = await response.json();
+  return r;
 }
 
-// 로그아웃
-export async function logout(token: string): Promise<void> {
-  await fetch(`${API_BASE_URL}/auth/logout`, {
-    method: "POST",
+export async function getEveryUserInfo(token: string): Promise<UserInfoResponse[]>{
+  const response = await fetch(`${API_BASE_URL}/user/everyuser`, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "사용자 정보 조회 실패");
+  }
+  var r = await response.json();
+  return r;
 }

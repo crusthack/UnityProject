@@ -92,6 +92,19 @@ namespace WebServer.Controllers
             return true;
         }
 
+
+        // --- Password helper methods ---
+        private static void CreatePasswordHash(string password, out byte[] hash, out byte[] salt)
+        {
+            salt = RandomNumberGenerator.GetBytes(16);
+            foreach(var b in salt)
+            {
+                Console.Write($"{b.ToString()} ");
+            }
+            // Use the static Pbkdf2 API to avoid obsolete constructors
+            hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
+        }
+
         [HttpPost("login")]
         public IActionResult Login(LoginRequest request)
         {
@@ -125,16 +138,10 @@ namespace WebServer.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             var tokenString = tokenHandler.WriteToken(token);
 
-            return Ok(new { token = tokenString, userId = user.UserID });
+            return Ok(new { token = tokenString, userID = user.UserID });
         }
 
-        // --- Password helper methods ---
-        private static void CreatePasswordHash(string password, out byte[] hash, out byte[] salt)
-        {
-            salt = RandomNumberGenerator.GetBytes(16);
-            // Use the static Pbkdf2 API to avoid obsolete constructors
-            hash = Rfc2898DeriveBytes.Pbkdf2(password, salt, 100_000, HashAlgorithmName.SHA256, 32);
-        }
+
 
         private static bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
         {

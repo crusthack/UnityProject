@@ -25,17 +25,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로딩 시 쿠키에서 토큰과 사용자 정보 확인
+  // 초기 로딩 시 쿠키에서 토큰 확인
   useEffect(() => {
     const savedToken = getJWTCookie();
-    const savedUser = getUserCookie();
     
     if (savedToken) {
       setTokenState(savedToken);
-    }
-    
-    if (savedUser) {
-      setUser(savedUser);
     }
     
     setIsLoading(false);
@@ -52,18 +47,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const setUserState = (newUser: User | null) => {
     setUser(newUser);
-    if (newUser) {
-      setUserCookie(newUser);
-    } else {
-      removeUserCookie();
-    }
+    // getUserInfo로 실시간 조회하므로 쿠키에 저장하지 않음
   };
 
   const logout = () => {
     setUser(null);
     setToken(null);
     removeJWTCookie();
-    removeUserCookie();
   };
 
   return (

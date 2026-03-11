@@ -3,14 +3,16 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { getUserInfo, UserInfo } from "@/lib/api";
+import { getUserInfo, getEveryUserInfo, UserInfoResponse } from "@/lib/api";
 import LogoutButton from "@/components/logout-button";
 
 export default function DashboardPage() {
   const router = useRouter();
   const { token, isLoading: authLoading } = useAuth();
-  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
+  const [allUsers, setAllUsers] = useState<UserInfoResponse[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isFetchingAll, setIsFetchingAll] = useState(false);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -34,6 +36,20 @@ export default function DashboardPage() {
 
     fetchUserInfo();
   }, [token, authLoading, router]);
+
+  const handleFetchAllUsers = async () => {
+    if (!token) return;
+    
+    setIsFetchingAll(true);
+    try {
+      const users = await getEveryUserInfo(token);
+      setAllUsers(users);
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "전체 사용자 정보를 가져오는데 실패했습니다.");
+    } finally {
+      setIsFetchingAll(false);
+    }
+  };
 
   if (authLoading || isLoading) {
     return (
@@ -85,12 +101,55 @@ export default function DashboardPage() {
             </div>
           )}
 
-          {/* 전체 JSON 데이터 */}
-          <div>
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">전체 데이터 (JSON)</h2>
+          {/* 내 정보 JSON 데이터 */}
+          <div className="mb-8">
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">내 정보 (JSON)</h2>
             <div className="bg-gray-900 text-green-400 p-6 rounded-lg overflow-auto font-mono text-sm">
               <pre>{JSON.stringify(userInfo, null, 2)}</pre>
             </div>
+          </div>
+
+          {/* 모든 사용자 정보 조회 버튼 및 테이블 */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold text-gray-700">모든 사용자 목록</h2>
+              <button
+                onClick={handleFetchAllUsers}
+                disabled={isFetchingAll}
+                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition disabled:bg-indigo-400"
+              >
+                {isFetchingAll ? "가져오는 중..." : "모든 사용자 정보 조회"}
+              </button>
+            </div>
+
+            {allUsers.length > 0 ? (
+              <div className="overflow-x-auto">
+                <table className="min-w-full bg-white border border-gray-200">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User No</th>
+                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
+                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salt</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {allUsers.map((user) => (
+                      <tr key={user.userNo}>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.userNo}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.userID}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(user.created).toLocaleString()}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.salt}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ) : (
+              <div className="text-center py-8 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-gray-500">
+                버튼을 눌러 사용자 목록을 불러오세요.
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -39,13 +39,7 @@ export default function LoginForm() {
       // 토큰 저장
       setToken(response.token);
       
-      // 사용자 정보 저장
-      setUser({
-        id: response.userId,
-        userID: response.userId,
-      });
-
-      console.log("설정된 사용자 정보:", { id: response.userId, userID: response.userId }); // 디버깅용
+      // 사용자 정보는 getUserInfo로 실시간 조회하므로 별도 저장하지 않음
 
       // 대시보드로 이동
       router.push("/dashboard");

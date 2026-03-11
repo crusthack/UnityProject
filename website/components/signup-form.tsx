@@ -42,11 +42,7 @@ export default function SignUpForm() {
       // 토큰 저장
       setToken(response.token);
       
-      // 사용자 정보 저장
-      setUser({
-        id: response.userId,
-        userID: response.userId,
-      });
+      // 사용자 정보는 getUserInfo로 실시간 조회하므로 별도 저장하지 않음
 
       // 대시보드로 이동
       router.push("/dashboard");
