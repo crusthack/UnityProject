@@ -141,8 +141,6 @@ namespace WebServer.Controllers
             return Ok(new { token = tokenString, userID = user.UserID });
         }
 
-
-
         private static bool VerifyPassword(string password, byte[] storedHash, byte[] storedSalt)
         {
             var computed = Rfc2898DeriveBytes.Pbkdf2(password, storedSalt, 100_000, HashAlgorithmName.SHA256, 32);

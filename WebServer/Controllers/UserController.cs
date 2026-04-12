@@ -20,8 +20,6 @@ namespace WebServer.Controllers
         }
 
         // 현재 인증된 사용자 정보를 반환합니다.
-        // JWT로 인증된 사용자만 접근할 수 있도록 [Authorize]를 사용합니다.
-        // 응답에는 비밀번호 관련 필드를 포함하지 않습니다.
         [HttpGet("info")]
         public IActionResult GetCurrentUser()
         {

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebServer.Data;
+using WebServer.Services;
 
 namespace WebServer
 {
@@ -19,6 +20,7 @@ namespace WebServer
             // 2. 컨트롤러(웹 API) 서비스 등록
             //    - JSON 직렬화, 모델 바인딩, API 동작 등이 활성화됩니다.
             builder.Services.AddControllers();
+            builder.Services.AddGrpc();
 
             // 3. CORS 설정
             //    - 개발환경에서 프론트엔드(예: Next.js dev 서버)를 허용하기 위한 정책을 추가합니다.
@@ -101,6 +103,8 @@ namespace WebServer
 
             // 13. 라우팅된 컨트롤러 매핑
             app.MapControllers();
+
+            app.MapGrpcService<MyGrpcService>();
 
             // 14. 애플리케이션 실행
             app.Run();
