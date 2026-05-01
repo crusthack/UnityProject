@@ -86,6 +86,8 @@ namespace WebServer
             // 7. 애플리케이션 빌드
             var app = builder.Build();
 
+            app.UseHttpsRedirection();
+
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
