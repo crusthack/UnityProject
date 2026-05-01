@@ -47,5 +47,8 @@ jobs:
             sudo fuser -k 5000/tcp || true
             cd /home/${{ secrets.EC2_USERNAME }}/game-server
             chmod +x WebServer
+            # 환경 변수와 함께 실행 (Kestrel 설정 덮어쓰기)
+            # 이름 규칙: 설정명__하위설정명__속성명
+            export Kestrel__Endpoints__Https__Certificate__Password="${{ secrets.CERT_PASSWORD }}"
             # 백그라운드 실행
             nohup ./WebServer > server.log 2>&1 &
