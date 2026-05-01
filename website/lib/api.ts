@@ -1,5 +1,5 @@
 // API 설정
-const API_BASE_URL = "http://crusthack.com/api";
+const API_BASE_URL = "http://crusthack.com:5000/api";
 
 interface SignUpData {
   userID: string;

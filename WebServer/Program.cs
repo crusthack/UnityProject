@@ -77,6 +77,15 @@ namespace WebServer
             // 7. 애플리케이션 빌드
             var app = builder.Build();
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var context = services.GetRequiredService<AppDbContext>(); // 사용자님의 DbContext 이름
+
+                // 방법 A: 테이블이 없으면 생성 (가장 단순함)
+                context.Database.EnsureCreated();
+            }
+
             // 9. 개발 환경에서만 Swagger UI 활성화
             if (app.Environment.IsDevelopment())
             {
