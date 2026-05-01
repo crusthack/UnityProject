@@ -18,7 +18,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0'
+          dotnet-version: '10.0'
 
       - name: Build and Publish
         run: |
@@ -30,7 +30,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
           source: "./publish/*"
           target: "/home/${{ secrets.EC2_USERNAME }}/game-server"
           strip_components: 1
