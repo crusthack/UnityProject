@@ -1,0 +1,51 @@
+name: ASP.Net Login Web Server AWS Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'WebServer/**' # 웹 서버 코드가 수정될 때만 배포 실행
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # 1. .NET 빌드 (ASP.NET Core 프로젝트 기준)
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0'
+
+      - name: Build and Publish
+        run: |
+          dotnet publish WebServer/WebServer.csproj -c Release -o ./publish
+
+      # 2. 빌드된 파일을 AWS로 전송 (SCP)
+      - name: Copy files to AWS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "./publish/*"
+          target: "/home/${{ secrets.EC2_USERNAME }}/game-server"
+          strip_components: 1
+
+      # 3. 서버에서 기존 프로세스 종료 후 재실행 (SSH)
+      - name: Restart Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            # 기존 포트(5000)를 사용하는 프로세스 종료
+            sudo fuser -k 5000/tcp || true
+            cd /home/${{ secrets.EC2_USERNAME }}/game-server
+            chmod +x WebServer
+            # 백그라운드 실행
+            nohup ./WebServer > server.log 2>&1 &
