@@ -1,5 +1,5 @@
 // API 설정
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://localhost:7155/api";
+const API_BASE_URL = "http://crusthack.com/api";
 
 interface SignUpData {
   userID: string;
