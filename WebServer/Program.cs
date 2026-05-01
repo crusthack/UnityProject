@@ -107,7 +107,7 @@ namespace WebServer
             builder.Services.AddHttpsRedirection(options =>
             {
                 options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 443;
+                options.HttpsPort = 443; 
             });
 
             // 11. CORS 미들웨어 적용
