@@ -33,6 +33,12 @@ namespace WebServer
                           .AllowAnyHeader()
                           .AllowCredentials()
                 );
+                options.AddPolicy("AllowFrontend", policy =>
+                    policy.WithOrigins("https://crusthack.github.io")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader()
+                        .AllowCredentials()
+                    );
             });
 
             // 4. JWT 인증 설정
