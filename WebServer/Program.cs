@@ -3,28 +3,19 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using WebServer.Data;
-using WebServer.Services;
 
 namespace WebServer
 {
-    // Program 클래스: 애플리케이션 진입점입니다.
-    // - WebApplicationBuilder를 사용하여 서비스(의존성)들을 등록하고
-    //   미들웨어 파이프라인을 구성한 뒤 앱을 실행합니다.
     public class Program
     {
         public static void Main(string[] args)
         {
-            // 1. 빌더 생성: 설정, 로깅, DI 컨테이너 등을 포함
             var builder = WebApplication.CreateBuilder(args);
 
-            // 2. 컨트롤러(웹 API) 서비스 등록
-            //    - JSON 직렬화, 모델 바인딩, API 동작 등이 활성화됩니다.
+            // Add services to the container.
             builder.Services.AddControllers();
-            builder.Services.AddGrpc();
 
-            // 3. CORS 설정
-            //    - 개발환경에서 프론트엔드(예: Next.js dev 서버)를 허용하기 위한 정책을 추가합니다.
-            //    - production 환경에서는 구체적인 도메인만 허용하도록 변경하세요.
+            // cors setting
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowFrontend", policy =>
@@ -65,7 +56,6 @@ namespace WebServer
 
             builder.Services.AddAuthorization();
             // 5. EF Core DbContext 등록 (SQLite 사용)
-            //    - connection string은 하드코딩되어 있으나 환경 설정으로 옮기는 것을 권장합니다.
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlite(builder.Configuration.GetConnectionString("app")));
 
@@ -73,19 +63,10 @@ namespace WebServer
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
 
-            // 10. HTTPS 리디렉션
-            //     - 개발 시 HTTPS가 설정되어 있다면 HTTP 요청을 HTTPS로 리디렉션합니다.
-            // Program.cs
-            builder.Services.AddHttpsRedirection(options =>
-            {
-                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
-                options.HttpsPort = 443;
-            });
 
-
-            // 7. 애플리케이션 빌드
             var app = builder.Build();
 
+            // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
 
             using (var scope = app.Services.CreateScope())
@@ -112,8 +93,6 @@ namespace WebServer
                 app.UseSwaggerUI();
             }
 
- 
-
             // 11. CORS 미들웨어 적용
             //     - 반드시 인증/인가 미들웨어 전에 실행되어야 프리플라이트 요청이 처리됩니다.
             app.UseCors("AllowFrontend");
@@ -125,9 +104,6 @@ namespace WebServer
             // 13. 라우팅된 컨트롤러 매핑
             app.MapControllers();
 
-            app.MapGrpcService<MyGrpcService>();
-
-            // 14. 애플리케이션 실행
             app.Run();
         }
     }
