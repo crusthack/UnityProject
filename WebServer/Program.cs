@@ -103,7 +103,12 @@ namespace WebServer
 
             // 10. HTTPS 리디렉션
             //     - 개발 시 HTTPS가 설정되어 있다면 HTTP 요청을 HTTPS로 리디렉션합니다.
-            app.UseHttpsRedirection();
+            // Program.cs
+            builder.Services.AddHttpsRedirection(options =>
+            {
+                options.RedirectStatusCode = StatusCodes.Status307TemporaryRedirect;
+                options.HttpsPort = 443;
+            });
 
             // 11. CORS 미들웨어 적용
             //     - 반드시 인증/인가 미들웨어 전에 실행되어야 프리플라이트 요청이 처리됩니다.

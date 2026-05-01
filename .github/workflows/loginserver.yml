@@ -44,7 +44,8 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
           script: |
             # 기존 포트(5000)를 사용하는 프로세스 종료
-            sudo fuser -k 5000/tcp || true
+            sudo fuser -k 443/tcp || true
+            sudo setcap 'cap_net_bind_service=+ep' ./WebServer
             cd /home/${{ secrets.EC2_USERNAME }}/game-server
             chmod +x WebServer
             # 환경 변수와 함께 실행 (Kestrel 설정 덮어쓰기)
