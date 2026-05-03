@@ -47,7 +47,7 @@ namespace WebServer.Controllers
                 return BadRequest("Passwords do not match");
 
             // for Test api
-            {
+            {   
                 if (request.UserID == "string")
                 {
                     return Ok("signup api running well");
@@ -122,7 +122,7 @@ namespace WebServer.Controllers
             var claims = new[] {
                 new Claim(ClaimTypes.NameIdentifier, user.UserNo.ToString()),
                 new Claim(ClaimTypes.Name, user.UserID)
-            };
+            };  
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtKey));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);

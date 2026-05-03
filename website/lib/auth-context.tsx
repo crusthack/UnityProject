@@ -1,59 +1,80 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { getJWTCookie, setJWTCookie, removeJWTCookie, getUserCookie, setUserCookie, removeUserCookie } from "./cookies";
-
-interface User {
-  id: string;
-  userID: string;
-}
+import { createContext, useContext, useState, useEffect, ReactNode, useCallback } from "react";
+import { getJWTCookie, setJWTCookie, removeJWTCookie } from "./cookies";
+import { getUserInfo, UserInfoResponse } from "./api";
 
 interface AuthContextType {
-  user: User | null;
+  user: UserInfoResponse | null;
   token: string | null;
   isLoading: boolean;
   isLoggedIn: boolean;
-  setUser: (user: User | null) => void;
   setToken: (token: string | null) => void;
+  refreshUserInfo: () => Promise<void>;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<UserInfoResponse | null>(null);
   const [token, setTokenState] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 초기 로딩 시 쿠키에서 토큰 확인
-  useEffect(() => {
-    const savedToken = getJWTCookie();
-    
-    if (savedToken) {
-      setTokenState(savedToken);
-    }
-    
-    setIsLoading(false);
+  const logout = useCallback(() => {
+    setUser(null);
+    setTokenState(null);
+    removeJWTCookie();
   }, []);
 
-  const setToken = (newToken: string | null) => {
+  // API 401 에러 감지 시 자동 로그아웃 처리
+  useEffect(() => {
+    const handleUnauthorized = () => {
+      console.warn("인증이 만료되었습니다. 로그아웃 처리합니다.");
+      logout();
+    };
+
+    window.addEventListener("auth:unauthorized", handleUnauthorized);
+    return () => window.removeEventListener("auth:unauthorized", handleUnauthorized);
+  }, [logout]);
+
+  const fetchUserInfo = useCallback(async (authToken: string) => {
+    try {
+      const info = await getUserInfo(authToken);
+      setUser(info);
+    } catch (error) {
+      console.error("사용자 정보 조회 실패:", error);
+    }
+  }, []);
+
+  // 초기 로딩 시 쿠키에서 토큰 확인 및 유저 정보 조회
+  useEffect(() => {
+    const initAuth = async () => {
+      const savedToken = getJWTCookie();
+      if (savedToken) {
+        setTokenState(savedToken);
+        await fetchUserInfo(savedToken);
+      }
+      setIsLoading(false);
+    };
+    initAuth();
+  }, [fetchUserInfo]);
+
+  const setToken = async (newToken: string | null) => {
     setTokenState(newToken);
     if (newToken) {
       setJWTCookie(newToken);
+      await fetchUserInfo(newToken);
     } else {
       removeJWTCookie();
+      setUser(null);
     }
   };
 
-  const setUserState = (newUser: User | null) => {
-    setUser(newUser);
-    // getUserInfo로 실시간 조회하므로 쿠키에 저장하지 않음
-  };
-
-  const logout = () => {
-    setUser(null);
-    setToken(null);
-    removeJWTCookie();
+  const refreshUserInfo = async () => {
+    if (token) {
+      await fetchUserInfo(token);
+    }
   };
 
   return (
@@ -63,8 +84,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         token,
         isLoading,
         isLoggedIn: !!token,
-        setUser: setUserState,
         setToken,
+        refreshUserInfo,
         logout,
       }}
     >
@@ -80,3 +101,4 @@ export function useAuth() {
   }
   return context;
 }
+

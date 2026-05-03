@@ -15,8 +15,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Auth App",
-  description: "회원가입 및 로그인 애플리케이션",
+  title: "Unity Project",
+  description: "유니티프로젝트를 위한 회원가입 사이트",
 };
 
 export default function RootLayout({

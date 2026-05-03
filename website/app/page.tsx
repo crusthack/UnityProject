@@ -15,7 +15,7 @@ export default function Home() {
   }, [isLoggedIn, isLoading, router]);
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-500 via-red-950 to-purple-600 px-4">
       <div className="max-w-md w-full text-center text-white">
         <h1 className="text-4xl font-bold mb-6">환영합니다</h1>
         <p className="text-lg mb-8 text-blue-100">

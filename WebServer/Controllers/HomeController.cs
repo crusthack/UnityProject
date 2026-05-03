@@ -1,7 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using System.Security.Claims;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace WebServer.Controllers
 {
@@ -15,6 +12,7 @@ namespace WebServer.Controllers
             public required int testNumber { get; set; }
         }
 
+        // /로 시작하면 절대 경로 지정임. 
         [HttpGet("/")]
         public string Index()
         {

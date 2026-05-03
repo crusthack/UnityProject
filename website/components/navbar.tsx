@@ -1,30 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { useAuth } from "@/lib/auth-context";
-import { getUserInfo, UserInfoResponse } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const router = useRouter();
-  const { isLoggedIn, logout, token } = useAuth();
-  const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
-
-  useEffect(() => {
-    if (isLoggedIn && token) {
-      getUserInfo(token)
-        .then((info) => {
-          setUserInfo(info);
-          console.log("사용자 정보 조회 성공:", info); // 디버깅용
-        })
-        .catch((error) => {
-          console.error("사용자 정보 조회 실패:", error);
-        });
-    } else {
-      setUserInfo(null);
-    }
-  }, [isLoggedIn, token]);
+  const { isLoggedIn, logout, user } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -37,19 +19,25 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           {/* 로고/홈 */}
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition">
-            <span className="text-2xl font-bold">🔐 Auth App</span>
+            <span className="text-2xl font-bold">Unity Project</span>
           </Link>
 
           {/* 네비게이션 링크 */}
           <div className="flex items-center space-x-4">
             {isLoggedIn ? (
               <>
-                <span className="text-sm">{userInfo?.userID} 님</span>
+                <span className="text-sm">{user?.userID} 님</span>
                 <Link
                   href="/dashboard"
                   className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"
                 >
                   대시보드
+                </Link>
+                <Link
+                  href="/health"
+                  className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"
+                >
+                  서버상태
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -80,3 +68,4 @@ export default function Navbar() {
     </nav>
   );
 }
+

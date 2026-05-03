@@ -3,38 +3,20 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
-import { getUserInfo, getEveryUserInfo, UserInfoResponse } from "@/lib/api";
+import { getEveryUserInfo, UserInfoResponse } from "@/lib/api";
+import { Button } from "@/components/ui/button";
 import LogoutButton from "@/components/logout-button";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { token, isLoading: authLoading } = useAuth();
-  const [userInfo, setUserInfo] = useState<UserInfoResponse | null>(null);
+  const { token, user, isLoading: authLoading } = useAuth();
   const [allUsers, setAllUsers] = useState<UserInfoResponse[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isFetchingAll, setIsFetchingAll] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
-    if (authLoading) return;
-
-    if (!token) {
+    if (!authLoading && !token) {
       router.push("/login");
-      return;
     }
-
-    const fetchUserInfo = async () => {
-      try {
-        const info = await getUserInfo(token);
-        setUserInfo(info);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "사용자 정보를 가져올 수 없습니다.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchUserInfo();
   }, [token, authLoading, router]);
 
   const handleFetchAllUsers = async () => {
@@ -51,7 +33,7 @@ export default function DashboardPage() {
     }
   };
 
-  if (authLoading || isLoading) {
+  if (authLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-100">
         <div className="text-center">
@@ -62,92 +44,73 @@ export default function DashboardPage() {
     );
   }
 
-  if (error) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4">
-        <div className="bg-white rounded-lg shadow-lg p-8 max-w-2xl w-full">
-          <div className="text-center">
-            <div className="text-red-600 text-2xl font-bold mb-4">오류 발생</div>
-            <p className="text-gray-600 mb-6">{error}</p>
-            <button
-              onClick={() => router.push("/login")}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
-            >
-              로그인으로 돌아가기
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-gray-100 py-8 px-4">
       <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-lg shadow-lg p-8">
+        <div className="bg-white rounded-xl shadow-lg p-8">
           {/* 헤더 */}
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-8 border-b pb-6">
             <h1 className="text-3xl font-bold text-gray-800">대시보드</h1>
             <LogoutButton />
           </div>
 
-          {/* 토큰 표시 */}
-          {token && (
-            <div className="mb-6">
-              <h2 className="text-lg font-semibold text-gray-700 mb-2">현재 JWT</h2>
-              <div className="bg-gray-100 p-4 rounded-lg font-mono text-sm break-all">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+            {/* 토큰 표시 */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-700">현재 인증 토큰</h2>
+              <div className="bg-gray-50 p-4 rounded-lg font-mono text-xs break-all border border-gray-200 h-40 overflow-y-auto">
                 {token}
               </div>
             </div>
-          )}
 
-          {/* 내 정보 JSON 데이터 */}
-          <div className="mb-8">
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">내 정보 (JSON)</h2>
-            <div className="bg-gray-900 text-green-400 p-6 rounded-lg overflow-auto font-mono text-sm">
-              <pre>{JSON.stringify(userInfo, null, 2)}</pre>
+            {/* 내 정보 */}
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold text-gray-700">내 정보 (JSON)</h2>
+              <div className="bg-gray-900 text-green-400 p-4 rounded-lg overflow-auto font-mono text-xs h-40">
+                <pre>{JSON.stringify(user, null, 2)}</pre>
+              </div>
             </div>
           </div>
 
-          {/* 모든 사용자 정보 조회 버튼 및 테이블 */}
-          <div>
-            <div className="flex items-center justify-between mb-4">
+          {/* 모든 사용자 정보 조회 */}
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold text-gray-700">모든 사용자 목록</h2>
-              <button
+              <Button
                 onClick={handleFetchAllUsers}
-                disabled={isFetchingAll}
-                className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition disabled:bg-indigo-400"
+                isLoading={isFetchingAll}
+                className="w-auto px-6"
               >
-                {isFetchingAll ? "가져오는 중..." : "모든 사용자 정보 조회"}
-              </button>
+                목록 불러오기
+              </Button>
             </div>
 
             {allUsers.length > 0 ? (
-              <div className="overflow-x-auto">
-                <table className="min-w-full bg-white border border-gray-200">
-                  <thead className="bg-gray-50">
+              <div className="overflow-x-auto rounded-lg border border-gray-200">
+                <table className="min-w-full bg-white">
+                  <thead className="bg-gray-50 text-gray-500 text-xs font-medium uppercase tracking-wider">
                     <tr>
-                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User No</th>
-                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User ID</th>
-                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
-                      <th className="px-6 py-3 border-b text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Salt</th>
+                      <th className="px-6 py-3 text-left">No</th>
+                      <th className="px-6 py-3 text-left">ID</th>
+                      <th className="px-6 py-3 text-left">Created</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-200">
-                    {allUsers.map((user) => (
-                      <tr key={user.userNo}>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.userNo}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{user.userID}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{new Date(user.created).toLocaleString()}</td>
-                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{user.salt}</td>
+                  <tbody className="divide-y divide-gray-200 text-sm">
+                    {allUsers.map((u) => (
+                      <tr key={u.userNo} className="hover:bg-gray-50 transition">
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-900">{u.userNo}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-900 font-medium">{u.userID}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">
+                          {new Date(u.created).toLocaleString()}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
                 </table>
               </div>
             ) : (
-              <div className="text-center py-8 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-gray-500">
-                버튼을 눌러 사용자 목록을 불러오세요.
+              <div className="text-center py-12 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-500">
+                버튼을 눌러 전체 사용자 목록을 동기화하세요.
               </div>
             )}
           </div>
@@ -156,3 +119,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
