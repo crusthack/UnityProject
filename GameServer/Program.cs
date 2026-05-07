@@ -6,17 +6,21 @@ namespace GameServer
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-
             builder.Services.AddControllers();
+
+            var serverName = builder.Configuration["Custom:ServerName"];
+            var serverCapa = builder.Configuration["Custom:ServerCapacity"];
+            Console.WriteLine($"Server Name: {serverName}");
+            Console.WriteLine($"Server Capa: {serverCapa}");
+
+            var loginUrl = builder.Configuration["Custom:LoginServerURL"] ?? "";
+            LoginServer.Init(loginUrl);
 
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
 
             app.MapControllers();
 

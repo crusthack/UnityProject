@@ -1,5 +1,7 @@
 // API 설정
 const API_BASE_URL = "https://crusthack.com/api";
+// const API_BASE_URL = "https://localhost:5000/api"; 로컬 웹 서버 
+
 
 interface SignUpData {
   userID: string;

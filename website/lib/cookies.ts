@@ -25,5 +25,5 @@ export function getJWTCookie(): string | null {
 
 // JWT 토큰 삭제 (로그아웃)
 export function removeJWTCookie() {
-  document.cookie = `${JWT_COOKIE_NAME}=;path=/;expires=Thu, 01 Jan 1970 00:00:00 UTC;`;
+  document.cookie = `${JWT_COOKIE_NAME}=; path=/; max-age=0; SameSite=Strict`;
 }

@@ -24,6 +24,12 @@ export default function Navbar() {
 
           {/* 네비게이션 링크 */}
           <div className="flex items-center space-x-4">
+            <Link
+              href="/health"
+              className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"
+            >
+              서버상태
+            </Link>
             {isLoggedIn ? (
               <>
                 <span className="text-sm">{user?.userID} 님</span>
@@ -32,12 +38,6 @@ export default function Navbar() {
                   className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"
                 >
                   대시보드
-                </Link>
-                <Link
-                  href="/health"
-                  className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"
-                >
-                  서버상태
                 </Link>
                 <button
                   onClick={handleLogout}
@@ -48,6 +48,7 @@ export default function Navbar() {
               </>
             ) : (
               <>
+
                 <Link
                   href="/signup"
                   className="hover:bg-blue-700 px-3 py-2 rounded-md text-sm font-medium transition"
