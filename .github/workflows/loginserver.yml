@@ -67,7 +67,7 @@ jobs:
             nohup ./WebServer > server.log 2>&1 &
             # cd gameServer
             cd /home/${{ secrets.EC2_USERNAME }}/gameServer
-            export CUSTOM__LOGINSERVERURL="https://localhost:443"
+            export CUSTOM__LOGINSERVERURL="https://crusthack.com"
             # 게임 서버 A
             chmod +x GameServer
             export CUSTOM__SERVERNAME="ServerA"
