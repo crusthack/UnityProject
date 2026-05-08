@@ -5,11 +5,12 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": false,
-      "applicationUrl": "http://localhost:5000;https://localhost:5001",
+      "applicationUrl": "http://localhost:7000;https://localhost:7001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "CUSTOM__SERVERNAME": "LocalServer",
-        "CUSTOM__SERVERCAPACITY": "100"
+        "CUSTOM__SERVERCAPACITY": "100",
+        "CUSTOM__LOGINSERVERURL": "https://localhost:5001"
       }
     },
     "product": {
@@ -20,7 +21,7 @@
         "ASPNETCORE_ENVIRONMENT": "Production",
         "CUSTOM__SERVERNAME": "ProductionTest",
         "CUSTOM__SERVERCAPACITY": "10",
-        "KESTREL__ENDPOINTS__HTTPS__URL": "https://localhost:7000"
+        "KESTREL__ENDPOINTS__HTTPS__URL": "https://localhost:7001"
       }
     }
   }

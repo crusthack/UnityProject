@@ -13,8 +13,7 @@ namespace GameServer
             Console.WriteLine($"Server Name: {serverName}");
             Console.WriteLine($"Server Capa: {serverCapa}");
 
-            var loginUrl = builder.Configuration["Custom:LoginServerURL"] ?? "";
-            LoginServer.Init(loginUrl);
+            GameServerContext.Init(builder.Configuration);
 
             var app = builder.Build();
 

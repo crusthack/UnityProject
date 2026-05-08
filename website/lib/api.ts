@@ -1,5 +1,5 @@
 // API 설정
-const API_BASE_URL = "https://crusthack.com/api";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 // const API_BASE_URL = "https://localhost:5000/api"; 로컬 웹 서버 
 
 
@@ -26,13 +26,18 @@ export interface UserInfoResponse {
   salt: string;
 }
 
+export interface GameServerResponse {
+  serverName: string;
+  ipAddress: string;
+  portNum: number;
+  capacity: number;
+  currentConnections: number;
+}
+
 /**
  * 공통 API 요청 함수
  */
-async function apiRequest<T>(
-  endpoint: string,
-  options: RequestInit = {}
-): Promise<T> {
+async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
   const headers = {
     "Content-Type": "application/json",
@@ -67,20 +72,6 @@ async function apiRequest<T>(
   }
 
   return response.json();
-}
-
-export interface HealthResponse {
-  status: string;
-  version: string;
-  environment: string;
-  serverTime: string;
-  uptime: string;
-  details: {
-    os: string;
-    framework: string;
-    memoryUsageMb: number;
-    cpuCount: number;
-  };
 }
 
 // 회원가입
@@ -119,11 +110,30 @@ export async function getEveryUserInfo(token: string): Promise<UserInfoResponse[
   });
 }
 
+export interface HealthResponse {
+  status: string;
+  version: string;
+  environment: string;
+  serverTime: string;
+  uptime: string;
+  details: {
+    os: string;
+    framework: string;
+    memoryUsageMb: number;
+    cpuCount: number;
+  };
+}
 /**
  * 서버 상태 확인
  */
 export async function getHealth(): Promise<HealthResponse> {
   return apiRequest<HealthResponse>("/Health", {
+    method: "GET",
+  });
+}
+
+export async function getGameServerList(token: string): Promise<GameServerResponse[]>{
+    return apiRequest<GameServerResponse[]>("/GameServer/ServerList", {
     method: "GET",
   });
 }

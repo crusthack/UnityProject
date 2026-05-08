@@ -21,7 +21,8 @@ namespace WebServer
                 options.AddPolicy("AllowFrontend", policy =>
                     policy.WithOrigins(
                         "https://crusthack.github.io",
-                        "http://localhost:3000"
+                        "http://localhost:3000",
+                        "http://localhost:3001"
                         )
                         .AllowAnyMethod()
                         .AllowAnyHeader()
