@@ -91,7 +91,8 @@ namespace WebServer.Controllers
         [HttpPost("Status")]
         public IActionResult UpdateStatus(StatusRequest request)
         {
-            if (!IsAuthorized()) return Unauthorized();
+            //if (!IsAuthorized()) return Unauthorized();
+            Console.WriteLine("Debug Log!!!");
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress!.ToString();
             var portNum = request.PortNum;
