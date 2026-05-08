@@ -1,10 +1,12 @@
 name: ASP.Net Login Web Server AWS Deploy
 
+# 게임 서버와 웹서버 배포 처리. 
 on:
   push:
     branches: [ "main" ]
     paths:
-      - 'WebServer/**' # 웹 서버 코드가 수정될 때만 배포 실행
+      - 'WebServer/**' # 웹 서버 코드가 수정될 시 배포
+      - 'GameServer/**' # 게임 서버 수정됐을 시 배포 
 
 jobs:
   deploy:
@@ -22,17 +24,28 @@ jobs:
 
       - name: Build and Publish
         run: |
-          dotnet publish WebServer/WebServer.csproj -c Release -o ./publish
+          dotnet publish WebServer/WebServer.csproj -c Release -o ./publish/webServer
+          dotnet publish GameServer/GameServer.csproj -c Release -o ./publish/gameServer
 
       # 2. 빌드된 파일을 AWS로 전송 (SCP)
-      - name: Copy files to AWS
+      - name: Copy files to AWS webServer
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
-          source: "./publish/*"
-          target: "/home/${{ secrets.EC2_USERNAME }}/game-server"
+          source: "./publish/webServer/*"
+          target: "/home/${{ secrets.EC2_USERNAME }}/webServer"
+          strip_components: 1
+
+      - name: Copy files to AWS gameServer
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
+          source: "./publish/gameServer/*"
+          target: "/home/${{ secrets.EC2_USERNAME }}/gameServer"
           strip_components: 1
 
       # 3. 서버에서 기존 프로세스 종료 후 재실행 (SSH)
@@ -44,12 +57,26 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
           script: |
             # 기존 포트(5000)를 사용하는 프로세스 종료
-            sudo fuser -k 443/tcp || true
-            cd /home/${{ secrets.EC2_USERNAME }}/game-server
+            sudo fuser -k 443/tcp 5000/tcp 5001/tcp 7000/tcp 7001/tcp || true
+            cd /home/${{ secrets.EC2_USERNAME }}/webServer
             sudo setcap 'cap_net_bind_service=+ep' ./WebServer
             chmod +x WebServer
-            # 환경 변수와 함께 실행 (Kestrel 설정 덮어쓰기)
-            # 이름 규칙: 설정명__하위설정명__속성명
             export Kestrel__Endpoints__Https__Certificate__Password="${{ secrets.CERT_PASSWORD }}"
-            # 백그라운드 실행
+            export CUSTOM__SECRETKEY="${{ secrets.INTERSERVER_SECRETKEY }}"
+            # 웹 서버 백그라운드 실행
             nohup ./WebServer > server.log 2>&1 &
+            # cd gameServer
+            cd /home/${{ secrets.EC2_USERNAME }}/gameServer
+            # 게임 서버 A
+            chmod +x GameServer
+            export CUSTOM__SERVERNAME="ServerA"
+            export CUSTOM__SERVERCAPACITY="100"
+            export Kestrel__Endpoints__Https__URL="https://0.0.0.0:5001"
+            export Kestrel__Endpoints__Http__URL="http://0.0.0.0:5000"
+            nohup ./GameServer > serverA.log 2>&1 &
+            # 게임 서버 B 
+            export CUSTOM__SERVERNAME="ServerB"
+            export CUSTOM__SERVERCAPACITY="1"
+            export Kestrel__Endpoints__Https__URL="https://0.0.0.0:7001"
+            export Kestrel__Endpoints__Http__URL="http://0.0.0.0:7000"
+            nohup ./GameServer > serverB.log 2>&1 &

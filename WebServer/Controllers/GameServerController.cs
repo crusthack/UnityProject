@@ -69,6 +69,7 @@ namespace WebServer.Controllers
 
             foreach (var key in keysToCheck)
             {
+                // 테스트용 
                 if (key.ToLower().StartsWith("test")) continue;
 
                 var server = gameServers[key];
