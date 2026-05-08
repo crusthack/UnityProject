@@ -21,7 +21,6 @@ namespace GameServer
             app.UseHttpsRedirection();
 
             app.UseAuthorization();
-
             app.MapControllers();
 
             app.Run();
