@@ -93,7 +93,10 @@ namespace WebServer.Controllers
         {
             if (!IsAuthorized()) return Unauthorized();
 
-            var ipAddress = HttpContext.Connection.RemoteIpAddress!.ToString();
+            var ip = HttpContext.Connection.RemoteIpAddress!;
+            var ipAddress = IPAddress.IsLoopback(ip) ? "crusthack.com" : ip.ToString();
+            Console.WriteLine(ipAddress);
+
             var portNum = request.PortNum;
 
             if (!IsGameServerAlive(ipAddress, portNum)) return BadRequest();  
@@ -137,8 +140,9 @@ namespace WebServer.Controllers
                         return true;
                     }
                 }
-                catch
+                catch(Exception e)
                 {
+                    Console.WriteLine(e.Message);
                     return false;
                 }
             }
