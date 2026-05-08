@@ -8,7 +8,7 @@
       "applicationUrl": "http://localhost:7000;https://localhost:7001",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "CUSTOM__SERVERNAME": "LocalServer",
+        "CUSTOM__SERVERNAME": "LocalServera",
         "CUSTOM__SERVERCAPACITY": "100",
         "CUSTOM__LOGINSERVERURL": "https://localhost:5001"
       }

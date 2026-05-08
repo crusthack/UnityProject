@@ -97,6 +97,7 @@ namespace GameServer
             req.Content = JsonContent.Create(data);
 
             _ = _instance.SendRequest(req);
+            Console.WriteLine("Status message sent successfully.");
         }
 
 
