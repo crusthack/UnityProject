@@ -65,6 +65,7 @@ jobs:
             export CUSTOM__SECRETKEY="${{ secrets.INTERSERVER_SECRETKEY }}"
             # 웹 서버 백그라운드 실행
             nohup ./WebServer > server.log 2>&1 &
+            # 서버 뜰 떄까지 대기 
             for i in {1..30}; do
                 if sudo lsof -i :443 > /dev/null; then
                     echo "WebServer is up!"

@@ -10,19 +10,7 @@ namespace WebServer.Controllers
     [ApiController]
     public class GameServerController : ControllerBase
     {
-        static Dictionary<string, GameServerContext> gameServers { get; set; } = new()
-        {
-            {
-                "testItem", new GameServerContext
-                {
-                    ServerName = "testServer",
-                    IpAddress = "0.0.0.0",
-                    PortNum = 7531,
-                    Capacity = -1,
-                    CurrentConnections = 2147483647
-                }
-            }
-        };
+        static Dictionary<string, GameServerContext> gameServers { get; set; } = new();
 
         private readonly string _secretKey;
         public GameServerController(IConfiguration configuration)
@@ -54,22 +42,34 @@ namespace WebServer.Controllers
             public required int CurrentConnections { get; set; }
         }
 
+        public class GameServerResponse
+        {
+            public required string ServerName { get; set; }
+            public required int ServerCapacity { get; set; }
+            public required int CurrentConnections { get; set; }
+        }
         //[Authorize]
         [HttpGet("ServerList")]
         public IActionResult ServerList()
         {
-            return Ok(gameServers.Values);
+            RenewGameServerList();
+
+            var response = gameServers.Values.Select(s => new GameServerResponse
+            {
+                ServerName = s.ServerName,
+                ServerCapacity = s.Capacity,
+                CurrentConnections = s.CurrentConnections,
+            }).ToList();
+
+            return Ok(response);
         }
 
         private void RenewGameServerList()
         {
             var keysToCheck = gameServers.Keys.ToList();
 
-                foreach (var key in keysToCheck)
-                {
-                // 테스트용 
-                if (key.ToLower().StartsWith("test")) continue;
-
+            foreach (var key in keysToCheck)
+            {
                 var server = gameServers[key];
                 bool isAlive = IsGameServerAlive(server.IpAddress, server.PortNum);
 
@@ -91,13 +91,12 @@ namespace WebServer.Controllers
         [HttpPost("Status")]
         public IActionResult UpdateStatus(StatusRequest request)
         {
-            //if (!IsAuthorized()) return Unauthorized();
-            Console.WriteLine("Debug Log!!!");
+            if (!IsAuthorized()) return Unauthorized();
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress!.ToString();
             var portNum = request.PortNum;
 
-            //if (!IsGameServerAlive(ipAddress, portNum)) return BadRequest();  
+            if (!IsGameServerAlive(ipAddress, portNum)) return BadRequest();  
 
             if (gameServers.TryGetValue(request.ServerName, out var context))
             {
