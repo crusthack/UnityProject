@@ -123,6 +123,7 @@ namespace WebServer.Controllers
         private bool IsGameServerAlive(string address, int portNum)
         {
             var uriBuilder = new UriBuilder("https", address, portNum, "api/Home/status");
+            Console.WriteLine(uriBuilder.Uri);
             var req = new HttpRequestMessage(HttpMethod.Get, uriBuilder.Uri);
             req.Headers.Add("X-Secret-Key", _secretKey);
 
