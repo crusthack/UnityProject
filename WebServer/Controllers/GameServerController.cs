@@ -65,21 +65,21 @@ namespace WebServer.Controllers
 
         private void RenewGameServerList()
         {
-            var keysToCheck = gameServers.Keys.ToList();
+            //var keysToCheck = gameServers.Keys.ToList();
 
-            foreach (var key in keysToCheck)
-            {
-                // 테스트용 
-                if (key.ToLower().StartsWith("test")) continue;
+            //foreach (var key in keysToCheck)
+            //{
+            //    // 테스트용 
+            //    if (key.ToLower().StartsWith("test")) continue;
 
-                var server = gameServers[key];
-                bool isAlive = IsGameServerAlive(server.IpAddress, server.PortNum);
+            //    var server = gameServers[key];
+            //    bool isAlive = IsGameServerAlive(server.IpAddress, server.PortNum);
 
-                if (!isAlive)
-                {
-                    gameServers.Remove(key);
-                }
-            }
+            //    if (!isAlive)
+            //    {
+            //        gameServers.Remove(key);
+            //    }
+            //}
         }
 
         public class StatusRequest
