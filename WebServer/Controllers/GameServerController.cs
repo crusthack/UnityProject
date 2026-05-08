@@ -13,9 +13,11 @@ namespace WebServer.Controllers
         static Dictionary<string, GameServerContext> gameServers { get; set; } = new();
 
         private readonly string _secretKey;
-        public GameServerController(IConfiguration configuration)
+        private readonly bool _isLocalDev;
+        public GameServerController(IConfiguration configuration, IWebHostEnvironment env)
         {
             _secretKey = configuration.GetValue<string>("Custom:SecretKey") ?? "DefaultKey";
+            _isLocalDev = env.IsDevelopment();
         }
         private bool IsAuthorized()
         {
@@ -48,6 +50,7 @@ namespace WebServer.Controllers
             public required int ServerCapacity { get; set; }
             public required int CurrentConnections { get; set; }
         }
+
         //[Authorize]
         [HttpGet("ServerList")]
         public IActionResult ServerList()
@@ -94,7 +97,7 @@ namespace WebServer.Controllers
             if (!IsAuthorized()) return Unauthorized();
 
             var ip = HttpContext.Connection.RemoteIpAddress!;
-            var ipAddress = IPAddress.IsLoopback(ip) ? "crusthack.com" : ip.ToString();
+            var ipAddress = !_isLocalDev && IPAddress.IsLoopback(ip) ? "crusthack.com" : ip.ToString();
             Console.WriteLine(ipAddress);
 
             var portNum = request.PortNum;

@@ -14,9 +14,13 @@ namespace GameServer
             Console.WriteLine($"Server Capacity: {serverCapa}");
             Console.WriteLine($"Login Server Address: {builder.Configuration["Custom:LoginServerURL"]}");
 
-            GameServerContext.Init(builder.Configuration);  
-
             var app = builder.Build();
+
+            // 서버 완전히 실행된 후 동작 
+            app.Lifetime.ApplicationStarted.Register(() =>
+            {
+                GameServerContext.Init(builder.Configuration);
+            });
 
             app.UseHttpsRedirection();
 
