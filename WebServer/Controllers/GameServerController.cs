@@ -96,9 +96,8 @@ namespace WebServer.Controllers
 
             var ipAddress = HttpContext.Connection.RemoteIpAddress!.ToString();
             var portNum = request.PortNum;
-            Console.WriteLine(portNum);
 
-            if (!IsGameServerAlive(ipAddress, portNum)) return BadRequest();
+            //if (!IsGameServerAlive(ipAddress, portNum)) return BadRequest();  
 
             if (gameServers.TryGetValue(request.ServerName, out var context))
             {
