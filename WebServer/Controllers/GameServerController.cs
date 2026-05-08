@@ -65,8 +65,8 @@ namespace WebServer.Controllers
         {
             var keysToCheck = gameServers.Keys.ToList();
 
-            foreach (var key in keysToCheck)
-            {
+                foreach (var key in keysToCheck)
+                {
                 // 테스트용 
                 if (key.ToLower().StartsWith("test")) continue;
 
@@ -115,6 +115,7 @@ namespace WebServer.Controllers
                 };
 
                 gameServers.Add(request.ServerName, newContext);
+                Console.WriteLine($"New gameServer added {request.ServerName}");
             }
 
             return Ok();
