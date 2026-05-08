@@ -36,7 +36,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
           source: "./publish/webServer/*"
           target: "/home/${{ secrets.EC2_USERNAME }}/webServer"
-          strip_components: 1
+          strip_components: 2
 
       - name: Copy files to AWS gameServer
         uses: appleboy/scp-action@v0.1.7
@@ -46,7 +46,7 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY_WEB_SERVER }}
           source: "./publish/gameServer/*"
           target: "/home/${{ secrets.EC2_USERNAME }}/gameServer"
-          strip_components: 1
+          strip_components: 2
 
       # 3. 서버에서 기존 프로세스 종료 후 재실행 (SSH)
       - name: Restart Server
