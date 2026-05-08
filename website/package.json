@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "dev2": "cross-env NEXT_PUBLIC_API_URL=https://crusthack.com/api next dev",
-    "build": "next build",
+    "build": "NEXT_PUBLIC_API_URL=https://crusthack.com/api next build",
     "start": "next start",
     "lint": "eslint"
   },
