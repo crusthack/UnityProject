@@ -1,6 +1,7 @@
 // API 설정
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
-// const API_BASE_URL = "https://localhost:5000/api"; 로컬 웹 서버 
+// npm run dev로 실행시 로컬 웹서버 주소 사용 http://localhost:5001/api
+// npm run dev2 및 production 환경에서는 crusthack.com/api의 배포된 웹 서버 사용 
 
 
 interface SignUpData {
@@ -65,8 +66,6 @@ async function apiRequest<T>(endpoint: string, options: RequestInit = {}): Promi
     if (response.status === 401 && typeof window !== "undefined") {
       window.dispatchEvent(new Event("auth:unauthorized"));
     }
-
-    throw new Error(errorDetail || `API 요청 실패: ${response.status}`);
   }
 
   return response.json();

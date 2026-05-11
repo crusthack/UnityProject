@@ -42,7 +42,7 @@ export default function HealthPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
+    <div className="min-h-screen bg-gray-100 bg-gradient-to-br from-blue-500 via-red-950 to-purple-600 py-12 px-4">
       <div className="max-w-3xl mx-auto">
         <div className="flex justify-between items-end mb-8">
           <div>

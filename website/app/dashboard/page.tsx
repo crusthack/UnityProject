@@ -10,8 +10,10 @@ import LogoutButton from "@/components/logout-button";
 export default function DashboardPage() {
   const router = useRouter();
   const { token, user, isLoading: authLoading } = useAuth();
+
   const [allUsers, setAllUsers] = useState<UserInfoResponse[]>([]);
   const [isFetchingAll, setIsFetchingAll] = useState(false);
+
   const [gameServers, setGameServers] = useState<GameServerResponse[]>([]);
   const [isFetchingGameServer, setIsFecthingGameServer] = useState(false);
 
@@ -61,7 +63,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 py-8 px-4">
+    <div className="min-h-screen bg-gray-100 bg-gradient-to-br from-blue-500 via-red-950 to-purple-600 py-8 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-xl shadow-lg p-8">
           {/* 헤더 */}
@@ -122,7 +124,7 @@ export default function DashboardPage() {
                       </tr>
                     ))}
                   </tbody>
-                </table>
+                </table>  
               </div>
             ) : (
               <div className="text-center py-12 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl text-gray-500">
@@ -144,7 +146,7 @@ export default function DashboardPage() {
               </Button>
             </div>
 
-            {allUsers.length > 0 ? (
+            {gameServers.length > 0 ? (
               <div className="overflow-x-auto rounded-lg border border-gray-200">
                 <table className="min-w-full bg-white">
                   <thead className="bg-gray-50 text-gray-500 text-xs font-medium uppercase tracking-wider">
@@ -155,7 +157,9 @@ export default function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200 text-sm">
-                    {gameServers.map((i) => (
+                    {[...gameServers].sort((a, b) => 
+                      a.serverName.localeCompare(b.serverName))
+                      .map((i) => (
                       <tr key={i.serverName} className="hover:bg-gray-50 transition">
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{i.serverName}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{i.serverCapacity}</td>
@@ -171,7 +175,6 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
-
         </div>
       </div>
     </div>

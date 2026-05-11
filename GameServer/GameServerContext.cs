@@ -11,7 +11,6 @@ namespace GameServer
 
         private readonly string _serverName;
         private readonly int _serverCapacity;
-        private readonly string _serverAddress;
         private readonly int _serverPort;
 
         private readonly string _loginURL;
@@ -32,7 +31,6 @@ namespace GameServer
             string fullAddress = configuration["Kestrel:Endpoints:Https:Url"] ?? "";
             var uri = new Uri(fullAddress);
 
-            this._serverAddress = uri.Host;
             this._serverPort = uri.Port;
 
             _client = new HttpClient();
