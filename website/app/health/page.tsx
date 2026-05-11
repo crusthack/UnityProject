@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { getHealth, HealthResponse } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 
@@ -10,13 +10,35 @@ export default function HealthPage() {
   const [error, setError] = useState("");
   const [nextRefresh, setNextRefresh] = useState(30);
 
+  // 실시간 표시를 위한 상태
+  const [displayTime, setDisplayTime] = useState<Date | null>(null);
+  const [displayUptime, setDisplayUptime] = useState<string>("");
+
+  // 서버 시간과 로컬 시간의 차이(ms) 및 서버 시작 시점 저장
+  const timeOffsetRef = useRef<number>(0);
+  const serverStartTimeRef = useRef<Date | null>(null);
+
   const fetchHealth = async () => {
     setIsLoading(true);
     setError("");
     try {
       const data = await getHealth();
       setHealth(data);
-      setNextRefresh(30); // 갱신 성공 시 타이머 리셋
+      setNextRefresh(30);
+
+      // 시간 계산 로직
+      const serverTime = new Date(data.serverTime);
+      const localTime = new Date();
+      
+      // 서버 시간 - 로컬 시간의 차이를 저장
+      timeOffsetRef.current = serverTime.getTime() - localTime.getTime();
+
+      // 업타임 문자열을 통해 서버가 구동된 절대 시점 계산 (대략적)
+      // data.uptime이 "00:05:30" 같은 형식이라고 가정할 때의 처리입니다.
+      // 서버에서 직접 'startTime'을 내려주면 더 정확하지만, 없다면 현재 서버시간에서 업타임을 뺍니다.
+      const uptimeMs = parseUptimeToMs(data.uptime);
+      serverStartTimeRef.current = new Date(serverTime.getTime() - uptimeMs);
+
     } catch (err) {
       setError(err instanceof Error ? err.message : "서버 상태를 불러올 수 없습니다.");
     } finally {
@@ -24,11 +46,38 @@ export default function HealthPage() {
     }
   };
 
+  // 업타임 문자열(HH:MM:SS)을 밀리초로 변환하는 헬퍼 함수
+  const parseUptimeToMs = (uptime: string) => {
+    const parts = uptime.split(':').map(Number);
+    if (parts.length === 3) { // HH:MM:SS
+      return ((parts[0] * 3600) + (parts[1] * 60) + parts[2]) * 1000;
+    }
+    return 0;
+  };
+
+  // 밀리초를 다시 HH:MM:SS로 변환
+  const formatMsToUptime = (ms: number) => {
+    const totalSeconds = Math.floor(ms / 1000);
+    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+    const s = (totalSeconds % 60).toString().padStart(2, '0');
+    return `${h}:${m}:${s}`;
+  };
+
   useEffect(() => {
     fetchHealth();
-    
-    // 1초마다 타이머 감소 및 0초 시 갱신
+
     const interval = setInterval(() => {
+      const now = new Date();
+
+      setDisplayTime(new Date(now.getTime() + timeOffsetRef.current));
+
+      if (serverStartTimeRef.current) {
+        const currentServerTimeMs = now.getTime() + timeOffsetRef.current;
+        const diff = currentServerTimeMs - serverStartTimeRef.current.getTime();
+        setDisplayUptime(formatMsToUptime(diff));
+      }
+
       setNextRefresh((prev) => {
         if (prev <= 1) {
           fetchHealth();
@@ -43,7 +92,7 @@ export default function HealthPage() {
 
   return (
     <div className="min-h-screen bg-gray-100 bg-gradient-to-br from-blue-500 via-red-950 to-purple-600 py-12 px-4">
-      <div className="max-w-3xl mx-auto">
+      <div className="max-w-3xl bg-gray-50 rounded-xl p-12 mx-auto">
         <div className="flex justify-between items-end mb-8">
           <div>
             <h1 className="text-3xl font-bold text-gray-800">System Health</h1>
@@ -91,28 +140,33 @@ export default function HealthPage() {
               </div>
             </div>
 
-            {/* 서버 시간 및 가동 시간 */}
+            {/* 서버 시간 및 가동 시간 (실시간 적용 부분) */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
               <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">Uptime</h2>
               <div className="space-y-4">
                 <div>
                   <p className="text-sm text-gray-500">Server Time</p>
-                  <p className="font-medium">{new Date(health.serverTime).toLocaleString()}</p>
+                  <p className="font-medium">
+                    {displayTime ? displayTime.toLocaleString() : "계산 중..."}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-500">Uptime</p>
-                  <p className="font-medium font-mono text-indigo-600">{health.uptime}</p>
+                  <p className="font-medium font-mono text-indigo-600">
+                    {displayUptime || health.uptime}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* 하드웨어 및 인프라 상세 */}
+            {/* System Details 섹션 생략 */}
+                        {/* 하드웨어 및 인프라 상세 */}
             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100 md:col-span-2">
               <h2 className="text-sm font-semibold text-gray-400 uppercase tracking-wider mb-4">System Details</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div className="p-3 bg-gray-50 rounded-lg">
+                <div className="p-3 bg-gray-50 h-full rounded-lg">
                   <p className="text-xs text-gray-500 mb-1">OS</p>
-                  <p className="text-sm font-semibold truncate" title={health.details.os}>{health.details.os}</p>
+                  <p className="text-sm font-semibold" title={health.details.os}>{health.details.os}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500 mb-1">Framework</p>
