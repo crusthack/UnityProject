@@ -46,23 +46,36 @@ export default function HealthPage() {
     }
   };
 
-  // 업타임 문자열(HH:MM:SS)을 밀리초로 변환하는 헬퍼 함수
-  const parseUptimeToMs = (uptime: string) => {
-    const parts = uptime.split(':').map(Number);
-    if (parts.length === 3) { // HH:MM:SS
-      return ((parts[0] * 3600) + (parts[1] * 60) + parts[2]) * 1000;
-    }
-    return 0;
-  };
+// 업타임 문자열(C# TimeSpan 형식)을 밀리초로 변환
+const parseUptimeToMs = (uptime: string) => {
+  // 예: "05:30:00", "1.02:03:04.123", "00:00:10.500"
+  const regex = /(?:(\d+)\.)?(\d{2}):(\d{2}):(\d{2})(?:\.(\d+))?/;
+  const match = uptime.match(regex);
 
-  // 밀리초를 다시 HH:MM:SS로 변환
-  const formatMsToUptime = (ms: number) => {
-    const totalSeconds = Math.floor(ms / 1000);
-    const h = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-    const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-    const s = (totalSeconds % 60).toString().padStart(2, '0');
-    return `${h}:${m}:${s}`;
-  };
+  if (match) {
+    const days = parseInt(match[1] || "0", 10);
+    const hours = parseInt(match[2], 10);
+    const minutes = parseInt(match[3], 10);
+    const seconds = parseInt(match[4], 10);
+    const ms = parseInt((match[5] || "0").substring(0, 3), 10); // 밀리초만 추출
+
+    return (
+      (days * 86400 + hours * 3600 + minutes * 60 + seconds) * 1000 + ms
+    );
+  }
+  return 0;
+};
+
+// 화면 표시용 (일자 표시 추가)
+const formatMsToUptime = (ms: number) => {
+  const totalSeconds = Math.floor(ms / 1000);
+  const d = Math.floor(totalSeconds / 86400);
+  const h = Math.floor((totalSeconds % 86400) / 3600).toString().padStart(2, '0');
+  const m = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+  const s = (totalSeconds % 60).toString().padStart(2, '0');
+  
+  return d > 0 ? `${d}d ${h}:${m}:${s}` : `${h}:${m}:${s}`;
+};
 
   useEffect(() => {
     fetchHealth();

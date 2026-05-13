@@ -50,10 +50,10 @@ namespace WebServer.Controllers
             var users = _context.Users
                     .Select(u => new
                     {
-                        u.UserNo,
+                        UserNo = u.UserNo,
                         UserID = u.UserID,
                         Created = u.CreatedAt,
-                        Salt = u.PasswordSalt,
+                        Salt = u.PasswordSalt.ToString(),
                     })
                     .ToList();
 

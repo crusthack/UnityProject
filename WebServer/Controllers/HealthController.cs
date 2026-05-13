@@ -10,18 +10,19 @@ namespace WebServer.Controllers
     {
         private static readonly DateTime _startTime = DateTime.UtcNow;
 
-        [HttpGet]
+        [HttpGet]   
         public IActionResult Get()
         {
             var process = System.Diagnostics.Process.GetCurrentProcess();
+            var uptimeSpan = DateTime.UtcNow - _startTime;
 
             return Ok(new
             {
                 status = "Healthy",
                 version = "1.0.0",
                 environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT"),
-                serverTime = DateTime.UtcNow,
-                uptime = DateTime.UtcNow - _startTime,
+                serverTime = DateTime.UtcNow.ToString("o"), 
+                uptimeMs = uptimeSpan.TotalMilliseconds,
                 details = new
                 {
                     os = System.Runtime.InteropServices.RuntimeInformation.OSDescription,
