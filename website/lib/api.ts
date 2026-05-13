@@ -112,7 +112,7 @@ export interface HealthResponse {
   version: string;
   environment: string;
   serverTime: string;
-  uptime: string;
+  uptimeMs: number;
   details: {
     os: string;
     framework: string;
