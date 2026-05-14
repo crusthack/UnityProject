@@ -1,12 +1,12 @@
 "use client";
 
 const JWT_COOKIE_NAME = "auth_token";
-const EXPIRY_DAYS = 7;
+const EXPIRY_Hours = .5;
 
 // JWT 토큰을 쿠키에 저장
-export function setJWTCookie(token: string, expiryDays: number = EXPIRY_DAYS) {
+export function setJWTCookie(token: string, expiryHours: number = EXPIRY_Hours) {
   const expiryDate = new Date();
-  expiryDate.setDate(expiryDate.getDate() + expiryDays);
+  expiryDate.setTime(expiryDate.getTime() + (expiryHours * 60 * 60 * 1000));
 
   document.cookie = `${JWT_COOKIE_NAME}=${token};path=/;expires=${expiryDate.toUTCString()};SameSite=Strict`;
 }

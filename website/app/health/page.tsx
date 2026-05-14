@@ -162,7 +162,7 @@ export default function HealthPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500 mb-1">OS</p>
-                  <p className="text-sm font-semibold truncate" title={health.details.os}>{health.details.os}</p>
+                  <p className="text-sm font-semibold" title={health.details.os}>{health.details.os}</p>
                 </div>
                 <div className="p-3 bg-gray-50 rounded-lg">
                   <p className="text-xs text-gray-500 mb-1">Framework</p>
