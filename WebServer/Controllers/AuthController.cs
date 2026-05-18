@@ -46,7 +46,7 @@ namespace WebServer.Controllers
             if (request.Password != request.PasswordConfirm)
                 return BadRequest("Passwords do not match");
 
-            // for Test api
+            // for Test
             {   
                 if (request.UserID == "string")
                 {

@@ -29,6 +29,7 @@ export interface UserInfoResponse {
 
 export interface GameServerResponse {
   serverName: string;
+  serverAddress: string;
   serverCapacity: number;
   currentConnections: number;
 }

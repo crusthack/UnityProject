@@ -22,7 +22,7 @@ namespace GameServer.Controllers
         [HttpGet("status")]
         public IActionResult Status()
         {
-            if(!IsAuthorized())
+            if (!IsAuthorized())
             {
                 return BadRequest();
             }
@@ -30,6 +30,23 @@ namespace GameServer.Controllers
 
 
             return Ok("Game Server running well");
+        }
+
+        public class ConnectRequest
+        {
+            public required int UserNo { get; set; }
+        }
+
+        [HttpPost("connect")]
+        public IActionResult Connect(ConnectRequest request)
+        {
+            if (!IsAuthorized())
+            {
+                return BadRequest();
+            }
+            Console.WriteLine(request.UserNo);
+
+            return Ok();
         }
 
         private bool IsAuthorized()

@@ -152,6 +152,7 @@ export default function DashboardPage() {
                   <thead className="bg-gray-50 text-gray-500 text-xs font-medium uppercase tracking-wider">
                     <tr>
                       <th className="px-6 py-3 text-left">서버 이름</th>
+                      <th className="px-6 py-3 text-left">서버 주소</th>
                       <th className="px-6 py-3 text-left">최대 접속 인원</th>
                       <th className="px-6 py-3 text-left">현재 접속자 수</th>
                     </tr>
@@ -162,6 +163,7 @@ export default function DashboardPage() {
                       .map((i) => (
                       <tr key={i.serverName} className="hover:bg-gray-50 transition">
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{i.serverName}</td>
+                        <td className="px-6 py-4 whitespace-nowrap text-gray-500">{i.serverAddress}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{i.serverCapacity}</td>
                         <td className="px-6 py-4 whitespace-nowrap text-gray-500">{i.currentConnections}</td>
                       </tr>
